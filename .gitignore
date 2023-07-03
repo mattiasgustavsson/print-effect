@@ -1,0 +1,13 @@
+.vs/ 
+debug/ 
+x64/ 
+*.exe 
+*.obj 
+*.sln 
+*.vcproj 
+*.vcxproj 
+*.vcxproj.user 
+*.ilk 
+*.ncb 
+*.pdb 
+*.suo 
