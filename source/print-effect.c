@@ -134,16 +134,17 @@ void rgb_to_cmy_dings( char const* in, char const* out ) {
 
 
 void rgb_to_cmy_halftone( char const* in, char const* out ) {
+    int mw, mh, mt;
+    uint8_t* c020 = (uint8_t*) stbi_load( "masks_src/32/c020.png", &mw, &mh, &mt, 1 );
+    uint8_t* m020 = (uint8_t*) stbi_load( "masks_src/32/m020.png", &mw, &mh, &mt, 1 );
+    uint8_t* y020 = (uint8_t*) stbi_load( "masks_src/32/y020.png", &mw, &mh, &mt, 1 );
+    uint8_t* c050 = (uint8_t*) stbi_load( "masks_src/32/c050.png", &mw, &mh, &mt, 1 );
+    uint8_t* m050 = (uint8_t*) stbi_load( "masks_src/32/m050.png", &mw, &mh, &mt, 1 );
+    uint8_t* y050 = (uint8_t*) stbi_load( "masks_src/32/y050.png", &mw, &mh, &mt, 1 );
+    uint8_t* c070 = (uint8_t*) stbi_load( "masks_src/32/c070.png", &mw, &mh, &mt, 1 );
+    uint8_t* m070 = (uint8_t*) stbi_load( "masks_src/32/m070.png", &mw, &mh, &mt, 1 );
+    uint8_t* y070 = (uint8_t*) stbi_load( "masks_src/32/y070.png", &mw, &mh, &mt, 1 );
     int w, h, t;
-    uint8_t* c020 = (uint8_t*) stbi_load( "masks_src/c020.png", &w, &h, &t, 1 );
-    uint8_t* m020 = (uint8_t*) stbi_load( "masks_src/m020.png", &w, &h, &t, 1 );
-    uint8_t* y020 = (uint8_t*) stbi_load( "masks_src/y020.png", &w, &h, &t, 1 );
-    uint8_t* c050 = (uint8_t*) stbi_load( "masks_src/c050.png", &w, &h, &t, 1 );
-    uint8_t* m050 = (uint8_t*) stbi_load( "masks_src/m050.png", &w, &h, &t, 1 );
-    uint8_t* y050 = (uint8_t*) stbi_load( "masks_src/y050.png", &w, &h, &t, 1 );
-    uint8_t* c070 = (uint8_t*) stbi_load( "masks_src/c070.png", &w, &h, &t, 1 );
-    uint8_t* m070 = (uint8_t*) stbi_load( "masks_src/m070.png", &w, &h, &t, 1 );
-    uint8_t* y070 = (uint8_t*) stbi_load( "masks_src/y070.png", &w, &h, &t, 1 );
     uint8_t* klut = (uint8_t*) stbi_load( "klut.png", &w, &h, &t, 1 );
     uint8_t* clut = (uint8_t*) stbi_load( "lut_src_data/c.png", &w, &h, &t, 1 );
     uint8_t* mlut = (uint8_t*) stbi_load( "lut_src_data/m.png", &w, &h, &t, 1 );
@@ -178,9 +179,9 @@ void rgb_to_cmy_halftone( char const* in, char const* out ) {
             //if( cc < 26 ) cc = 255; else if( cc < 90 ) cc = c020[ xp + yp * w ]; else if( cc < 153 ) cc = c050[ xp + yp * w ]; else if( cc < 216 ) cc = c070[ xp + yp * w ]; else cc = 0;
             //if( cm < 26 ) cm = 255; else if( cm < 90 ) cm = m020[ xp + yp * w ]; else if( cm < 153 ) cm = m050[ xp + yp * w ]; else if( cm < 216 ) cm = m070[ xp + yp * w ]; else cm = 0;
             //if( cy < 26 ) cy = 255; else if( cy < 90 ) cy = y020[ xp + yp * w ]; else if( cy < 153 ) cy = y050[ xp + yp * w ]; else if( cy < 216 ) cy = y070[ xp + yp * w ]; else cy = 0;
-            if( cc < 40 ) cc = 255; else if( cc < 90 ) cc = c020[ xp + yp * w ]; else if( cc < 153 ) cc = c050[ xp + yp * w ]; else if( cc < 216 ) cc = c070[ xp + yp * w ]; else cc = 0;
-            if( cm < 40 ) cm = 255; else if( cm < 90 ) cm = m020[ xp + yp * w ]; else if( cm < 153 ) cm = m050[ xp + yp * w ]; else if( cm < 216 ) cm = m070[ xp + yp * w ]; else cm = 0;
-            if( cy < 40 ) cy = 255; else if( cy < 90 ) cy = y020[ xp + yp * w ]; else if( cy < 153 ) cy = y050[ xp + yp * w ]; else if( cy < 216 ) cy = y070[ xp + yp * w ]; else cy = 0;
+            if( cc < 40 ) cc = 255; else if( cc < 90 ) cc = c020[ xp + yp * mw ]; else if( cc < 153 ) cc = c050[ xp + yp * mw ]; else if( cc < 216 ) cc = c070[ xp + yp * mw ]; else cc = 0;
+            if( cm < 40 ) cm = 255; else if( cm < 90 ) cm = m020[ xp + yp * mw ]; else if( cm < 153 ) cm = m050[ xp + yp * mw ]; else if( cm < 216 ) cm = m070[ xp + yp * mw ]; else cm = 0;
+            if( cy < 40 ) cy = 255; else if( cy < 90 ) cy = y020[ xp + yp * mw ]; else if( cy < 153 ) cy = y050[ xp + yp * mw ]; else if( cy < 216 ) cy = y070[ xp + yp * mw ]; else cy = 0;
             cc = lerp( clut[ i ], cc, imgk[ x + y * w ] );
             cm = lerp( mlut[ i ], cm, imgk[ x + y * w ] );
             cy = lerp( ylut[ i ], cy, imgk[ x + y * w ] );
@@ -209,31 +210,33 @@ int subclamp( int a, int b ) {
 }
 
 void rgb_to_cmy_halftone_dings( char const* in, char const* out ) {
+    int mw, mh, mt;
+    uint8_t* c020 = (uint8_t*) stbi_load( "masks_src/32/c020.png", &mw, &mh, &mt, 1 );
+    uint8_t* m020 = (uint8_t*) stbi_load( "masks_src/32/m020.png", &mw, &mh, &mt, 1 );
+    uint8_t* y020 = (uint8_t*) stbi_load( "masks_src/32/y020.png", &mw, &mh, &mt, 1 );
+    uint8_t* c050 = (uint8_t*) stbi_load( "masks_src/32/c050.png", &mw, &mh, &mt, 1 );
+    uint8_t* m050 = (uint8_t*) stbi_load( "masks_src/32/m050.png", &mw, &mh, &mt, 1 );
+    uint8_t* y050 = (uint8_t*) stbi_load( "masks_src/32/y050.png", &mw, &mh, &mt, 1 );
+    uint8_t* c070 = (uint8_t*) stbi_load( "masks_src/32/c070.png", &mw, &mh, &mt, 1 );
+    uint8_t* m070 = (uint8_t*) stbi_load( "masks_src/32/m070.png", &mw, &mh, &mt, 1 );
+    uint8_t* y070 = (uint8_t*) stbi_load( "masks_src/32/y070.png", &mw, &mh, &mt, 1 );
+
     int w, h, t;
     uint8_t* dingsc = (uint8_t*) stbi_load( "lut_src_data/dings1.png", &w, &h, &t, 1 );
     uint8_t* dingsm = (uint8_t*) stbi_load( "lut_src_data/dings2.png", &w, &h, &t, 1 );
     uint8_t* dingsy = (uint8_t*) stbi_load( "lut_src_data/dings3.png", &w, &h, &t, 1 );
-    uint8_t* c020 = (uint8_t*) stbi_load( "masks_src/c020.png", &w, &h, &t, 1 );
-    uint8_t* m020 = (uint8_t*) stbi_load( "masks_src/m020.png", &w, &h, &t, 1 );
-    uint8_t* y020 = (uint8_t*) stbi_load( "masks_src/y020.png", &w, &h, &t, 1 );
-    uint8_t* c050 = (uint8_t*) stbi_load( "masks_src/c050.png", &w, &h, &t, 1 );
-    uint8_t* m050 = (uint8_t*) stbi_load( "masks_src/m050.png", &w, &h, &t, 1 );
-    uint8_t* y050 = (uint8_t*) stbi_load( "masks_src/y050.png", &w, &h, &t, 1 );
-    uint8_t* c070 = (uint8_t*) stbi_load( "masks_src/c070.png", &w, &h, &t, 1 );
-    uint8_t* m070 = (uint8_t*) stbi_load( "masks_src/m070.png", &w, &h, &t, 1 );
-    uint8_t* y070 = (uint8_t*) stbi_load( "masks_src/y070.png", &w, &h, &t, 1 );
 
     for( int y = 0; y < h; ++y ) {
         for( int x = 0; x < w; ++x ) {
-            c020[ x + y * w ] = subclamp( c020[ x + y * w ], lerp( dingsc[ x + y * w ], 0, 210 ) );
-            c050[ x + y * w ] = subclamp( c050[ x + y * w ], lerp( dingsc[ x + y * w ], 0, 210 ) );
-            c070[ x + y * w ] = subclamp( c070[ x + y * w ], lerp( dingsc[ x + y * w ], 0, 210 ) );
-            m020[ x + y * w ] = subclamp( m020[ x + y * w ], lerp( dingsm[ x + y * w ], 0, 210 ) );
-            m050[ x + y * w ] = subclamp( m050[ x + y * w ], lerp( dingsm[ x + y * w ], 0, 210 ) );
-            m070[ x + y * w ] = subclamp( m070[ x + y * w ], lerp( dingsm[ x + y * w ], 0, 210 ) );
-            y020[ x + y * w ] = subclamp( y020[ x + y * w ], lerp( dingsy[ x + y * w ], 0, 210 ) );
-            y050[ x + y * w ] = subclamp( y050[ x + y * w ], lerp( dingsy[ x + y * w ], 0, 210 ) );
-            y070[ x + y * w ] = subclamp( y070[ x + y * w ], lerp( dingsy[ x + y * w ], 0, 210 ) );
+            c020[ x + y * mw ] = subclamp( c020[ x + y * mw ], lerp( dingsc[ x + y * w ], 0, 224 ) );
+            c050[ x + y * mw ] = subclamp( c050[ x + y * mw ], lerp( dingsc[ x + y * w ], 0, 224 ) );
+            c070[ x + y * mw ] = subclamp( c070[ x + y * mw ], lerp( dingsc[ x + y * w ], 0, 224 ) );
+            m020[ x + y * mw ] = subclamp( m020[ x + y * mw ], lerp( dingsm[ x + y * w ], 0, 224 ) );
+            m050[ x + y * mw ] = subclamp( m050[ x + y * mw ], lerp( dingsm[ x + y * w ], 0, 224 ) );
+            m070[ x + y * mw ] = subclamp( m070[ x + y * mw ], lerp( dingsm[ x + y * w ], 0, 224 ) );
+            y020[ x + y * mw ] = subclamp( y020[ x + y * mw ], lerp( dingsy[ x + y * w ], 0, 224 ) );
+            y050[ x + y * mw ] = subclamp( y050[ x + y * mw ], lerp( dingsy[ x + y * w ], 0, 224 ) );
+            y070[ x + y * mw ] = subclamp( y070[ x + y * mw ], lerp( dingsy[ x + y * w ], 0, 224 ) );
         }
     }
 
@@ -271,9 +274,9 @@ void rgb_to_cmy_halftone_dings( char const* in, char const* out ) {
             //if( cc < 26 ) cc = 255; else if( cc < 90 ) cc = c020[ xp + yp * w ]; else if( cc < 153 ) cc = c050[ xp + yp * w ]; else if( cc < 216 ) cc = c070[ xp + yp * w ]; else cc = 0;
             //if( cm < 26 ) cm = 255; else if( cm < 90 ) cm = m020[ xp + yp * w ]; else if( cm < 153 ) cm = m050[ xp + yp * w ]; else if( cm < 216 ) cm = m070[ xp + yp * w ]; else cm = 0;
             //if( cy < 26 ) cy = 255; else if( cy < 90 ) cy = y020[ xp + yp * w ]; else if( cy < 153 ) cy = y050[ xp + yp * w ]; else if( cy < 216 ) cy = y070[ xp + yp * w ]; else cy = 0;
-            if( cc < 40 ) cc = 255; else if( cc < 90 ) cc = c020[ xp + yp * w ]; else if( cc < 153 ) cc = c050[ xp + yp * w ]; else if( cc < 216 ) cc = c070[ xp + yp * w ]; else cc = 0;
-            if( cm < 40 ) cm = 255; else if( cm < 90 ) cm = m020[ xp + yp * w ]; else if( cm < 153 ) cm = m050[ xp + yp * w ]; else if( cm < 216 ) cm = m070[ xp + yp * w ]; else cm = 0;
-            if( cy < 40 ) cy = 255; else if( cy < 90 ) cy = y020[ xp + yp * w ]; else if( cy < 153 ) cy = y050[ xp + yp * w ]; else if( cy < 216 ) cy = y070[ xp + yp * w ]; else cy = 0;
+            if( cc < 40 ) cc = 255; else if( cc < 90 ) cc = c020[ xp + yp * mw ]; else if( cc < 153 ) cc = c050[ xp + yp * mw ]; else if( cc < 216 ) cc = c070[ xp + yp * mw ]; else cc = 0;
+            if( cm < 40 ) cm = 255; else if( cm < 90 ) cm = m020[ xp + yp * mw ]; else if( cm < 153 ) cm = m050[ xp + yp * mw ]; else if( cm < 216 ) cm = m070[ xp + yp * mw ]; else cm = 0;
+            if( cy < 40 ) cy = 255; else if( cy < 90 ) cy = y020[ xp + yp * mw ]; else if( cy < 153 ) cy = y050[ xp + yp * mw ]; else if( cy < 216 ) cy = y070[ xp + yp * mw ]; else cy = 0;
             cc = lerp( clut[ i ], cc, imgk[ x + y * w ] );
             cm = lerp( mlut[ i ], cm, imgk[ x + y * w ] );
             cy = lerp( ylut[ i ], cy, imgk[ x + y * w ] );
@@ -332,7 +335,7 @@ void noise_k( char const* in, char const* out ) {
             uint32_t v = io[ x + y * w ];
             v = lerp( v, lerp( v, 255, n ), 105 );
             
-            io[ x + y * w ] = lerp( v < k ? v : k, 255, subclamp( 90, dings[ x + y * w ] / 8 ) );
+            io[ x + y * w ] = lerp( v < k ? v : k, 255, subclamp( 40, dings[ x + y * w ] / 8 ) );
         }
     }
     
@@ -492,7 +495,7 @@ void overlay( char const* in, char const* out ) {
         for( int x = 0; x < w; ++x ) {
             uint32_t p = img[ x + y * w ];
             //p = rgbsub( 0xffffff, p );
-            p = rgblerp( p, rgbadd( 0x101010, RGBMUL32( p, p ) ), 128 );
+            p = rgblerp( p, rgbadd( 0x101010, RGBMUL32( p, p ) ), 200 );
             //p = rgbsub( 0xffffff, p );
             uint32_t t = tex[ ( x % tw ) + ( y % th ) * tw ];
             t = rgbdarken( p, t );
@@ -527,11 +530,10 @@ int main( int argc, char** argv ) {
     overlay( "out1.png", "overlay1.png" );
     overlay( "out2.png", "overlay2.png" );
     overlay( "out3.png", "overlay3.png" );
-
     rgb_to_k( "test_src/test4.png", "outk4.png" );
     rgb_to_k( "test_src/test5.png", "outk5.png" );
-    rgb_to_cmy_dings( "test_src/test4.png", "outcmy4.png" );
-    rgb_to_cmy_dings( "test_src/test5.png", "outcmy5.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test4.png", "outcmy4.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test5.png", "outcmy5.png" );
     noise_k( "outk4.png", "noisek4.png" );
     noise_k( "outk5.png", "noisek5.png" );
     noise_cmy( "outcmy4.png", "noisecmy4.png" );
