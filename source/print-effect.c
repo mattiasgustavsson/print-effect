@@ -2,6 +2,7 @@
 #include <stdint.h> 
 #include <stdio.h> 
 #include <string.h> 
+#include <math.h> 
 
 #include "libs/stb_image.h"
 #include "libs/stb_image_resize.h"
@@ -209,6 +210,28 @@ int subclamp( int a, int b ) {
     return v < 0 ? 0 : v;
 }
 
+int clamp( int v ) {
+    return v < 0 ? 0 : v > 255 ? 255 : v;
+}
+
+uint32_t hueshift( uint32_t in ) {
+    int in_r = ( in >> 16 ) & 0xff;
+    int in_g = ( in >> 8  ) & 0xff;
+    int in_b = ( in       ) & 0xff;
+    float fHue = 4.5f;
+    const float cosA = cos(fHue*3.14159265f/180); //convert degrees to radians
+    const float sinA = sin(fHue*3.14159265f/180); //convert degrees to radians
+    //calculate the rotation matrix, only depends on Hue
+    float matrix[3][3] = {{cosA + (1.0f - cosA) / 3.0f, 1.0f/3.0f * (1.0f - cosA) - sqrtf(1.0f/3.0f) * sinA, 1.0f/3.0f * (1.0f - cosA) + sqrtf(1.0f/3.0f) * sinA},
+        {1.0f/3.0f * (1.0f - cosA) + sqrtf(1.0f/3.0f) * sinA, cosA + 1.0f/3.0f*(1.0f - cosA), 1.0f/3.0f * (1.0f - cosA) - sqrtf(1.0f/3.0f) * sinA},
+        {1.0f/3.0f * (1.0f - cosA) - sqrtf(1.0f/3.0f) * sinA, 1.0f/3.0f * (1.0f - cosA) + sqrtf(1.0f/3.0f) * sinA, cosA + 1.0f/3.0f * (1.0f - cosA)}};
+    //Use the rotation matrix to convert the RGB directly
+    int r = clamp( in_r*matrix[0][0] + in_g*matrix[0][1] + in_b*matrix[0][2] );
+    int g = clamp( in_r*matrix[1][0] + in_g*matrix[1][1] + in_b*matrix[1][2] );
+    int b = clamp( in_r*matrix[2][0] + in_g*matrix[2][1] + in_b*matrix[2][2] );
+    return ( r << 16 ) | ( g << 8 ) | b;
+}
+
 void rgb_to_cmy_halftone_dings( char const* in, char const* out ) {
     int mw, mh, mt;
     uint8_t* c020 = (uint8_t*) stbi_load( "masks_src/32/c020.png", &mw, &mh, &mt, 1 );
@@ -217,9 +240,9 @@ void rgb_to_cmy_halftone_dings( char const* in, char const* out ) {
     uint8_t* c050 = (uint8_t*) stbi_load( "masks_src/32/c050.png", &mw, &mh, &mt, 1 );
     uint8_t* m050 = (uint8_t*) stbi_load( "masks_src/32/m050.png", &mw, &mh, &mt, 1 );
     uint8_t* y050 = (uint8_t*) stbi_load( "masks_src/32/y050.png", &mw, &mh, &mt, 1 );
-    uint8_t* c070 = (uint8_t*) stbi_load( "masks_src/32/c070.png", &mw, &mh, &mt, 1 );
-    uint8_t* m070 = (uint8_t*) stbi_load( "masks_src/32/m070.png", &mw, &mh, &mt, 1 );
-    uint8_t* y070 = (uint8_t*) stbi_load( "masks_src/32/y070.png", &mw, &mh, &mt, 1 );
+    //uint8_t* c070 = (uint8_t*) stbi_load( "masks_src/32/c070.png", &mw, &mh, &mt, 1 );
+    //uint8_t* m070 = (uint8_t*) stbi_load( "masks_src/32/m070.png", &mw, &mh, &mt, 1 );
+    //uint8_t* y070 = (uint8_t*) stbi_load( "masks_src/32/y070.png", &mw, &mh, &mt, 1 );
 
     int w, h, t;
     uint8_t* dingsc = (uint8_t*) stbi_load( "lut_src_data/dings1.png", &w, &h, &t, 1 );
@@ -230,13 +253,13 @@ void rgb_to_cmy_halftone_dings( char const* in, char const* out ) {
         for( int x = 0; x < w; ++x ) {
             c020[ x + y * mw ] = subclamp( c020[ x + y * mw ], lerp( dingsc[ x + y * w ], 0, 224 ) );
             c050[ x + y * mw ] = subclamp( c050[ x + y * mw ], lerp( dingsc[ x + y * w ], 0, 224 ) );
-            c070[ x + y * mw ] = subclamp( c070[ x + y * mw ], lerp( dingsc[ x + y * w ], 0, 224 ) );
+            //c070[ x + y * mw ] = subclamp( c070[ x + y * mw ], lerp( dingsc[ x + y * w ], 0, 224 ) );
             m020[ x + y * mw ] = subclamp( m020[ x + y * mw ], lerp( dingsm[ x + y * w ], 0, 224 ) );
             m050[ x + y * mw ] = subclamp( m050[ x + y * mw ], lerp( dingsm[ x + y * w ], 0, 224 ) );
-            m070[ x + y * mw ] = subclamp( m070[ x + y * mw ], lerp( dingsm[ x + y * w ], 0, 224 ) );
+            //m070[ x + y * mw ] = subclamp( m070[ x + y * mw ], lerp( dingsm[ x + y * w ], 0, 224 ) );
             y020[ x + y * mw ] = subclamp( y020[ x + y * mw ], lerp( dingsy[ x + y * w ], 0, 224 ) );
             y050[ x + y * mw ] = subclamp( y050[ x + y * mw ], lerp( dingsy[ x + y * w ], 0, 224 ) );
-            y070[ x + y * mw ] = subclamp( y070[ x + y * mw ], lerp( dingsy[ x + y * w ], 0, 224 ) );
+            //y070[ x + y * mw ] = subclamp( y070[ x + y * mw ], lerp( dingsy[ x + y * w ], 0, 224 ) );
         }
     }
 
@@ -266,17 +289,18 @@ void rgb_to_cmy_halftone_dings( char const* in, char const* out ) {
     for( int y = 0; y < h; ++y ) {
         for( int x = 0; x < w; ++x ) {
             uint32_t i = img[ x + y * w ] & 0xffffff;
+            uint32_t i_shift = hueshift(i);
             uint32_t cc = 255 - clut[ i ];
-            uint32_t cm = 255 - mlut[ i ];
-            uint32_t cy = 255 - ylut[ i ];
+            uint32_t cm = 255 - mlut[ i_shift ];
+            uint32_t cy = 255 - ylut[ i_shift ];
             int xp = x;
             int yp = y;
             //if( cc < 26 ) cc = 255; else if( cc < 90 ) cc = c020[ xp + yp * w ]; else if( cc < 153 ) cc = c050[ xp + yp * w ]; else if( cc < 216 ) cc = c070[ xp + yp * w ]; else cc = 0;
             //if( cm < 26 ) cm = 255; else if( cm < 90 ) cm = m020[ xp + yp * w ]; else if( cm < 153 ) cm = m050[ xp + yp * w ]; else if( cm < 216 ) cm = m070[ xp + yp * w ]; else cm = 0;
             //if( cy < 26 ) cy = 255; else if( cy < 90 ) cy = y020[ xp + yp * w ]; else if( cy < 153 ) cy = y050[ xp + yp * w ]; else if( cy < 216 ) cy = y070[ xp + yp * w ]; else cy = 0;
-            if( cc < 40 ) cc = 255; else if( cc < 90 ) cc = c020[ xp + yp * mw ]; else if( cc < 153 ) cc = c050[ xp + yp * mw ]; else if( cc < 216 ) cc = c070[ xp + yp * mw ]; else cc = 0;
-            if( cm < 40 ) cm = 255; else if( cm < 90 ) cm = m020[ xp + yp * mw ]; else if( cm < 153 ) cm = m050[ xp + yp * mw ]; else if( cm < 216 ) cm = m070[ xp + yp * mw ]; else cm = 0;
-            if( cy < 40 ) cy = 255; else if( cy < 90 ) cy = y020[ xp + yp * mw ]; else if( cy < 153 ) cy = y050[ xp + yp * mw ]; else if( cy < 216 ) cy = y070[ xp + yp * mw ]; else cy = 0;
+            if( cc < /*40*/ 45 ) cc = 255; else if( cc < /*90*/ 100 ) cc = c020[ xp + yp * mw ]; else if( cc < /*153*/ 170 ) cc = c050[ xp + yp * mw ]; /*else if( cc < 216 ) cc = c070[ xp + yp * mw ]; */ else cc = 0;
+            if( cm < /*40*/ 35 ) cm = 255; else if( cm < /*90*/ 85 ) cm = m020[ xp + yp * mw ]; else if( cm < /*153*/ 170 ) cm = m050[ xp + yp * mw ]; /*else if( cm < 216 ) cm = m070[ xp + yp * mw ]; */ else cm = 0;
+            if( cy < /*40*/ 30 ) cy = 255; else if( cy < /*90*/ 80 ) cy = y020[ xp + yp * mw ]; else if( cy < /*153*/ 170 ) cy = y050[ xp + yp * mw ]; /*else if( cy < 216 ) cy = y070[ xp + yp * mw ]; */ else cy = 0;
             cc = lerp( clut[ i ], cc, imgk[ x + y * w ] );
             cm = lerp( mlut[ i ], cm, imgk[ x + y * w ] );
             cy = lerp( ylut[ i ], cy, imgk[ x + y * w ] );
@@ -515,6 +539,9 @@ int main( int argc, char** argv ) {
     rgb_to_k( "test_src/test1.png", "outk1.png" );
     rgb_to_k( "test_src/test2.png", "outk2.png" );
     rgb_to_k( "test_src/test3.png", "outk3.png" );
+    rgb_to_cmy( "test_src/test1.png", "outcmyraw1.png" );
+    rgb_to_cmy( "test_src/test2.png", "outcmyraw2.png" );
+    rgb_to_cmy( "test_src/test3.png", "outcmyraw3.png" );
     rgb_to_cmy_halftone_dings( "test_src/test1.png", "outcmy1.png" );
     rgb_to_cmy_halftone_dings( "test_src/test2.png", "outcmy2.png" );
     rgb_to_cmy_halftone_dings( "test_src/test3.png", "outcmy3.png" );
@@ -530,6 +557,58 @@ int main( int argc, char** argv ) {
     overlay( "out1.png", "overlay1.png" );
     overlay( "out2.png", "overlay2.png" );
     overlay( "out3.png", "overlay3.png" );
+
+
+
+    rgb_to_k( "test_src/test6.png", "outk6.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test6.png", "outcmy6.png" );
+    noise_k( "outk6.png", "noisek6.png" );
+    noise_cmy( "outcmy6.png", "noisecmy6.png" );
+    adjusted_img( "noisecmy6.png", "noisek6.png", "out6.png" );
+    overlay( "out6.png", "overlay6.png" );
+
+    rgb_to_k( "test_src/test7.png", "outk7.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test7.png", "outcmy7.png" );
+    noise_k( "outk7.png", "noisek7.png" );
+    noise_cmy( "outcmy7.png", "noisecmy7.png" );
+    adjusted_img( "noisecmy7.png", "noisek7.png", "out7.png" );
+    overlay( "out7.png", "overlay7.png" );
+
+    rgb_to_k( "test_src/test8.png", "outk8.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test8.png", "outcmy8.png" );
+    noise_k( "outk8.png", "noisek8.png" );
+    noise_cmy( "outcmy8.png", "noisecmy8.png" );
+    adjusted_img( "noisecmy8.png", "noisek8.png", "out8.png" );
+    overlay( "out8.png", "overlay8.png" );
+
+    rgb_to_k( "test_src/test9.png", "outk9.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test9.png", "outcmy9.png" );
+    noise_k( "outk9.png", "noisek9.png" );
+    noise_cmy( "outcmy9.png", "noisecmy9.png" );
+    adjusted_img( "noisecmy9.png", "noisek9.png", "out9.png" );
+    overlay( "out9.png", "overlay9.png" );
+
+    rgb_to_k( "test_src/test10.png", "outk10.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test10.png", "outcmy10.png" );
+    noise_k( "outk10.png", "noisek10.png" );
+    noise_cmy( "outcmy10.png", "noisecmy10.png" );
+    adjusted_img( "noisecmy10.png", "noisek10.png", "out10.png" );
+    overlay( "out10.png", "overlay10.png" );
+
+    rgb_to_k( "test_src/test11.png", "outk11.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test11.png", "outcmy11.png" );
+    noise_k( "outk11.png", "noisek11.png" );
+    noise_cmy( "outcmy11.png", "noisecmy11.png" );
+    adjusted_img( "noisecmy11.png", "noisek11.png", "out11.png" );
+    overlay( "out11.png", "overlay11.png" );
+
+    rgb_to_k( "test_src/test12.png", "outk12.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test12.png", "outcmy12.png" );
+    noise_k( "outk12.png", "noisek12.png" );
+    noise_cmy( "outcmy12.png", "noisecmy12.png" );
+    adjusted_img( "noisecmy12.png", "noisek12.png", "out12.png" );
+    overlay( "out12.png", "overlay12.png" );
+
     rgb_to_k( "test_src/test4.png", "outk4.png" );
     rgb_to_k( "test_src/test5.png", "outk5.png" );
     rgb_to_cmy_halftone_dings( "test_src/test4.png", "outcmy4.png" );
