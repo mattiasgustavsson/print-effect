@@ -43,6 +43,12 @@ int internal_printed_subclamp( int a, int b ) {
 }
 
 
+int internal_printed_addclamp( int a, int b ) {
+    int v = a + b;
+    return v > 255 ? 255 : v;
+}
+
+
 printed_t* printed_create( void ) {
     printed_t* printed = (printed_t*)malloc( sizeof( printed_t ) );
     memset( printed, 0, sizeof( printed_t ) );
@@ -92,12 +98,12 @@ printed_t* printed_create( void ) {
 
     for( int y = 0; y < h; ++y ) {
         for( int x = 0; x < w; ++x ) {
-            printed->c020[ x + y * printed->refwidth ] = internal_printed_subclamp( printed->c020[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsc[ x + y * w ], 0, 224 ) );
-            printed->c050[ x + y * printed->refwidth ] = internal_printed_subclamp( printed->c050[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsc[ x + y * w ], 0, 224 ) );
-            printed->m020[ x + y * printed->refwidth ] = internal_printed_subclamp( printed->m020[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsm[ x + y * w ], 0, 224 ) );
-            printed->m050[ x + y * printed->refwidth ] = internal_printed_subclamp( printed->m050[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsm[ x + y * w ], 0, 224 ) );
-            printed->y020[ x + y * printed->refwidth ] = internal_printed_subclamp( printed->y020[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsy[ x + y * w ], 0, 224 ) );
-            printed->y050[ x + y * printed->refwidth ] = internal_printed_subclamp( printed->y050[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsy[ x + y * w ], 0, 224 ) );
+            printed->c020[ x + y * printed->refwidth ] = internal_printed_addclamp( printed->c020[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsc[ x + y * w ], 0, 232 ) );
+            printed->c050[ x + y * printed->refwidth ] = internal_printed_addclamp( printed->c050[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsc[ x + y * w ], 0, 232 ) );
+            printed->m020[ x + y * printed->refwidth ] = internal_printed_addclamp( printed->m020[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsm[ x + y * w ], 0, 232 ) );
+            printed->m050[ x + y * printed->refwidth ] = internal_printed_addclamp( printed->m050[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsm[ x + y * w ], 0, 232 ) );
+            printed->y020[ x + y * printed->refwidth ] = internal_printed_addclamp( printed->y020[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsy[ x + y * w ], 0, 232 ) );
+            printed->y050[ x + y * printed->refwidth ] = internal_printed_addclamp( printed->y050[ x + y * printed->refwidth ], internal_printed_lerp( printed->dingsy[ x + y * w ], 0, 232 ) );
         }
     }
 
