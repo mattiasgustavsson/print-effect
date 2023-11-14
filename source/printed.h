@@ -198,9 +198,9 @@ uint32_t* internal_printed_rgb_to_cmy_halftone_dings( printed_t* printed, uint32
             uint32_t cy = 255 - printed->ylut[ i_shift ];
             int xp = x;
             int yp = y;
-            if( cc < 45 ) cc = 255; else if( cc < 100 ) cc = printed->c020[ xp + yp * printed->refwidth ]; else if( cc < 170 ) cc = printed->c050[ xp + yp * printed->refwidth ]; else cc = 0;
+            if( cc < 35 ) cc = 255; else if( cc < 100 ) cc = printed->c020[ xp + yp * printed->refwidth ]; else if( cc < 170 ) cc = printed->c050[ xp + yp * printed->refwidth ]; else cc = 0;
             if( cm < 35 ) cm = 255; else if( cm <  85 ) cm = printed->m020[ xp + yp * printed->refwidth ]; else if( cm < 170 ) cm = printed->m050[ xp + yp * printed->refwidth ]; else cm = 0;
-            if( cy < 30 ) cy = 255; else if( cy <  80 ) cy = printed->y020[ xp + yp * printed->refwidth ]; else if( cy < 170 ) cy = printed->y050[ xp + yp * printed->refwidth ]; else cy = 0;
+            if( cy < 25 ) cy = 255; else if( cy <  80 ) cy = printed->y020[ xp + yp * printed->refwidth ]; else if( cy < 170 ) cy = printed->y050[ xp + yp * printed->refwidth ]; else cy = 0;
             cc = lerp( printed->clut[ i ], cc, kmask[ x + y * w ] );
             cm = lerp( printed->mlut[ i ], cm, kmask[ x + y * w ] );
             cy = lerp( printed->ylut[ i ], cy, kmask[ x + y * w ] );
