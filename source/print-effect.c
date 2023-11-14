@@ -8,6 +8,8 @@
 #include "libs/stb_image_resize.h"
 #include "libs/stb_image_write.h"
 
+#include "printed.h"
+
 void combine_k_lut( void ) {
     float* klut = (float*)malloc( 4096ull * 4096ull * sizeof( float ) );
     memset( klut, 0, 4096ull * 4096ull * sizeof( float ) );
@@ -534,8 +536,15 @@ void overlay( char const* in, char const* out ) {
 }
 
  
-int main( int argc, char** argv ) { 
+int oldmain( int argc, char** argv ) { 
     //combine_k_lut();
+    rgb_to_k( "test_src/test15.png", "outk15.png" );
+    rgb_to_cmy_halftone_dings( "test_src/test15.png", "outcmy15.png" );
+    noise_k( "outk15.png", "noisek15.png" );
+    noise_cmy( "outcmy15.png", "noisecmy15.png" );
+    adjusted_img( "noisecmy15.png", "noisek15.png", "out15.png" );
+    overlay( "out15.png", "overlay15.png" );
+
     rgb_to_k( "test_src/test1.png", "outk1.png" );
     rgb_to_k( "test_src/test2.png", "outk2.png" );
     rgb_to_k( "test_src/test3.png", "outk3.png" );
@@ -623,7 +632,40 @@ int main( int argc, char** argv ) {
     overlay( "out5.png", "overlay5.png" );
     return EXIT_SUCCESS; 
 } 
- 
+
+void process( printed_t* printed, char const* in, char const* out ) {
+    int width, height;
+    uint32_t* output = printed_process( printed, in, &width, &height );
+    if( output ) {
+        printf( "%s\n", in );
+        stbi_write_png( out, width, height, 4, output, width * 4 );
+        free( output );
+    }
+}
+
+
+int main( int argc, char** argv ) { 
+    printed_t* printed = printed_create();
+    process( printed, "test_src/test1.png", "processed/test1.png" );
+    process( printed, "test_src/test2.png", "processed/test2.png" );
+    process( printed, "test_src/test3.png", "processed/test3.png" );
+    process( printed, "test_src/test4.png", "processed/test4.png" );
+    process( printed, "test_src/test5.png", "processed/test5.png" );
+    process( printed, "test_src/test6.png", "processed/test6.png" );
+    process( printed, "test_src/test7.png", "processed/test7.png" );
+    process( printed, "test_src/test8.png", "processed/test8.png" );
+    process( printed, "test_src/test9.png", "processed/test9.png" );
+    process( printed, "test_src/test10.png", "processed/test10.png" );
+    process( printed, "test_src/test11.png", "processed/test11.png" );
+    process( printed, "test_src/test12.png", "processed/test12.png" );
+    process( printed, "test_src/test13.png", "processed/test13.png" );
+    process( printed, "test_src/test14.png", "processed/test14.png" );
+    process( printed, "test_src/test15.png", "processed/test15.png" );
+    printed_destroy( printed );
+    return EXIT_SUCCESS; 
+} 
+
+
 #pragma warning( push )
 #pragma warning( disable: 4255 )
 #pragma warning( disable: 4668 )
