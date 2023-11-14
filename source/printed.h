@@ -51,43 +51,43 @@ printed_t* printed_create( void ) {
     printed->refheight = 3056;
 
     int w, h, t;
-    printed->klut = (uint8_t*) stbi_load( "klut.png", &w, &h, &t, 1 );
+    printed->klut = (uint8_t*) stbi_load( "data/klut.png", &w, &h, &t, 1 );
     if( !printed->klut ) goto error;
-    printed->clut = (uint8_t*) stbi_load( "lut_src_data/c.png", &w, &h, &t, 1 );
+    printed->clut = (uint8_t*) stbi_load( "data/c.png", &w, &h, &t, 1 );
     if( !printed->clut ) goto error;
-    printed->mlut = (uint8_t*) stbi_load( "lut_src_data/m.png", &w, &h, &t, 1 );
+    printed->mlut = (uint8_t*) stbi_load( "data/m.png", &w, &h, &t, 1 );
     if( !printed->mlut ) goto error;
-    printed->ylut = (uint8_t*) stbi_load( "lut_src_data/y.png", &w, &h, &t, 1 );
+    printed->ylut = (uint8_t*) stbi_load( "data/y.png", &w, &h, &t, 1 );
     if( !printed->ylut ) goto error;
 
-    printed->c020 = (uint8_t*) stbi_load( "masks_src/32/c020.png", &w, &h, &t, 1 );
+    printed->c020 = (uint8_t*) stbi_load( "data/c020.png", &w, &h, &t, 1 );
     if( !printed->c020 || w != printed->refwidth || h != printed->refheight ) goto error;
-    printed->m020 = (uint8_t*) stbi_load( "masks_src/32/m020.png", &w, &h, &t, 1 );
+    printed->m020 = (uint8_t*) stbi_load( "data/m020.png", &w, &h, &t, 1 );
     if( !printed->m020 || w != printed->refwidth || h != printed->refheight ) goto error;
-    printed->y020 = (uint8_t*) stbi_load( "masks_src/32/y020.png", &w, &h, &t, 1 );
+    printed->y020 = (uint8_t*) stbi_load( "data/y020.png", &w, &h, &t, 1 );
     if( !printed->y020 || w != printed->refwidth || h != printed->refheight ) goto error;
-    printed->c050 = (uint8_t*) stbi_load( "masks_src/32/c050.png", &w, &h, &t, 1 );
+    printed->c050 = (uint8_t*) stbi_load( "data/c050.png", &w, &h, &t, 1 );
     if( !printed->c050 || w != printed->refwidth || h != printed->refheight ) goto error;
-    printed->m050 = (uint8_t*) stbi_load( "masks_src/32/m050.png", &w, &h, &t, 1 );
+    printed->m050 = (uint8_t*) stbi_load( "data/m050.png", &w, &h, &t, 1 );
     if( !printed->m050 || w != printed->refwidth || h != printed->refheight ) goto error;
-    printed->y050 = (uint8_t*) stbi_load( "masks_src/32/y050.png", &w, &h, &t, 1 );
+    printed->y050 = (uint8_t*) stbi_load( "data/y050.png", &w, &h, &t, 1 );
     if( !printed->y050 || w != printed->refwidth || h != printed->refheight ) goto error;
 
-    printed->dingsc = (uint8_t*) stbi_load( "lut_src_data/dings1.png", &w, &h, &t, 1 );
+    printed->dingsc = (uint8_t*) stbi_load( "data/dings1.png", &w, &h, &t, 1 );
     if( !printed->dingsc || w != printed->refwidth || h != printed->refheight ) goto error;
-    printed->dingsm = (uint8_t*) stbi_load( "lut_src_data/dings2.png", &w, &h, &t, 1 );
+    printed->dingsm = (uint8_t*) stbi_load( "data/dings2.png", &w, &h, &t, 1 );
     if( !printed->dingsm || w != printed->refwidth || h != printed->refheight ) goto error;
-    printed->dingsy = (uint8_t*) stbi_load( "lut_src_data/dings3.png", &w, &h, &t, 1 );
+    printed->dingsy = (uint8_t*) stbi_load( "data/dings3.png", &w, &h, &t, 1 );
     if( !printed->dingsy || w != printed->refwidth || h != printed->refheight ) goto error;
-    printed->dingsk = (uint8_t*) stbi_load( "lut_src_data/dings4.png", &w, &h, &t, 1 );
+    printed->dingsk = (uint8_t*) stbi_load( "data/dings4.png", &w, &h, &t, 1 );
     if( !printed->dingsk || w != printed->refwidth || h != printed->refheight ) goto error;
 
-    printed->noise = (uint8_t*) stbi_load( "lut_src_data/cloud_noise.png", &w, &h, &t, 1 );
+    printed->noise = (uint8_t*) stbi_load( "data/cloud_noise.png", &w, &h, &t, 1 );
     if( !printed->noise || w != printed->refwidth || h != printed->refheight ) goto error;
-    printed->unfiltered_noise = (uint8_t*) stbi_load( "lut_src_data/unfiltered_noise.png", &w, &h, &t, 1 );
+    printed->unfiltered_noise = (uint8_t*) stbi_load( "data/unfiltered_noise.png", &w, &h, &t, 1 );
     if( !printed->unfiltered_noise || w != printed->refwidth || h != printed->refheight ) goto error;
 
-    printed->tex = (uint32_t*) stbi_load( "lut_src_data/paper_desat.png", &w, &h, &t, 4 );
+    printed->tex = (uint32_t*) stbi_load( "data/paper_desat.png", &w, &h, &t, 4 );
     if( !printed->tex || w != printed->refwidth || h != printed->refheight ) goto error;
 
     for( int y = 0; y < h; ++y ) {
