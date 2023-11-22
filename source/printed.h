@@ -100,8 +100,8 @@ printed_t* printed_create( void ) {
         for( int x = 0; x < printed->refwidth * 2; ++x ) {
             printed->c020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->c020[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsc[ x + y * printed->refwidth * 2 ], 0, 232 ) );
             printed->c050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->c050[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsc[ x + y * printed->refwidth * 2 ], 0, 232 ) );
-            printed->m020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->m020[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsm[ x + y * printed->refwidth * 2 ], 0, 232 ) );
-            printed->m050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->m050[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsm[ x + y * printed->refwidth * 2 ], 0, 232 ) );
+            printed->m020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->m020[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsm[ x + y * printed->refwidth * 2 ], 0, 240 ) );
+            printed->m050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->m050[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsm[ x + y * printed->refwidth * 2 ], 0, 240 ) );
             printed->y020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->y020[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsy[ x + y * printed->refwidth * 2 ], 0, 232 ) );
             printed->y050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->y050[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsy[ x + y * printed->refwidth * 2 ], 0, 232 ) );
         }
@@ -197,18 +197,29 @@ uint32_t* internal_printed_rgb_to_cmy_halftone_dings( printed_t* printed, uint32
     uint32_t* output = (uint32_t*) malloc( width * height * sizeof( uint32_t ) );
     for( int y = 0; y < h; ++y ) {
         for( int x = 0; x < w; ++x ) {
+            /*
+            uint32_t ic = ( x - 0 >= 0 && y + 10 < height ) ? ( source[ x - 0 + ( y + 10 ) * w ] ) : 0xffffff;
+            uint8_t cmask = ( x - 0 >= 0 && y + 10 < height ) ? ( kmask[ x - 0 + ( y + 10 ) * w ] ) : 0x00;
+            ic = lerp( source[ x + y * w ], ic, cmask > 64 ? 255 : 0 ) & 0xffffff;
+
+            uint32_t im = ( x + 8 < width && y + 6 < height ) ? ( source[ x + 8 + ( y + 6 ) * w ] ) : 0xffffff;
+            uint8_t mmask = ( x + 8 < width && y + 6 < height ) ? ( kmask[ x + 8 + ( y + 6 ) * w ] ) : 0x00;
+            im = lerp( source[ x + y * w ], im, mmask > 64 ? 255 : 0 ) & 0xffffff;
+            */
             uint32_t i = source[ x + y * w ] & 0xffffff;
             uint32_t i_shift = internal_printed_hueshift(i);
-            uint32_t cc = 255 - printed->clut[ i ];
-            uint32_t cm = 255 - printed->mlut[ i_shift ];
+            //uint32_t ic_shift = internal_printed_hueshift(ic);
+            //uint32_t im_shift = internal_printed_hueshift(im);
+            uint32_t cc = 255 - printed->clut[ i_shift /*ic_shift*/ ];
+            uint32_t cm = 255 - printed->mlut[ i_shift /*im_shift*/ ];
             uint32_t cy = 255 - printed->ylut[ i_shift ];
             int xp = x;
             int yp = y;
-            if( cc < 35 ) cc = 255; else if( cc < 100 ) cc = printed->c020[ xp + yp * printed->refwidth * 2 ]; else if( cc < 170 ) cc = printed->c050[ xp + yp * printed->refwidth * 2 ]; else cc = 0;
+            if( cc < 25 ) cc = 255; else if( cc < 100 ) cc = printed->c020[ xp + yp * printed->refwidth * 2 ]; else if( cc < 160 ) cc = printed->c050[ xp + yp * printed->refwidth * 2 ]; else cc = 0;
             if( cm < 35 ) cm = 255; else if( cm <  85 ) cm = printed->m020[ xp + yp * printed->refwidth * 2 ]; else if( cm < 170 ) cm = printed->m050[ xp + yp * printed->refwidth * 2 ]; else cm = 0;
             if( cy < 25 ) cy = 255; else if( cy <  80 ) cy = printed->y020[ xp + yp * printed->refwidth * 2 ]; else if( cy < 170 ) cy = printed->y050[ xp + yp * printed->refwidth * 2 ]; else cy = 0;
-            cc = lerp( printed->clut[ i ], cc, kmask[ x + y * w ] );
-            cm = lerp( printed->mlut[ i ], cm, kmask[ x + y * w ] );
+            cc = lerp( printed->clut[ i /*ic*/ ], cc, kmask[ x + y * w ] );
+            cm = lerp( printed->mlut[ i /*im*/ ], cm, kmask[ x + y * w ] );
             cy = lerp( printed->ylut[ i ], cy, kmask[ x + y * w ] );
             uint32_t cmy = ( cc << 16 ) | ( cm << 8 ) | cy;
             output[ x + y * w ] = 0xff000000 | ( cmy & 0xffffff );

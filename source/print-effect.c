@@ -640,7 +640,11 @@ void process( printed_t* printed, char const* in, char const* out ) {
     uint32_t* output = printed_process( printed, in, &width, &height );
     if( output ) {
         printf( "%s\n", in );
-        stbi_write_jpg( out, width, height, 4, output, 85 );
+        if( stricmp( strrchr( out, '.' ), ".png" ) == 0 ) {
+            stbi_write_png( out, width, height, 4, output, width * 4 );
+        } else {
+            stbi_write_jpg( out, width, height, 4, output, 85 );
+        }
         free( output );
     }
 }
@@ -717,21 +721,22 @@ int main( int argc, char** argv ) {
 
 int xmain( int argc, char** argv ) { 
     printed_t* printed = printed_create();
-    process( printed, "test_src/test1.png", "processed/test1.jpg" );
-    process( printed, "test_src/test2.png", "processed/test2.jpg" );
-    process( printed, "test_src/test3.png", "processed/test3.jpg" );
-    process( printed, "test_src/test4.png", "processed/test4.jpg" );
-    process( printed, "test_src/test5.png", "processed/test5.jpg" );
-    process( printed, "test_src/test6.png", "processed/test6.jpg" );
-    process( printed, "test_src/test7.png", "processed/test7.jpg" );
-    process( printed, "test_src/test8.png", "processed/test8.jpg" );
-    process( printed, "test_src/test9.png", "processed/test9.jpg" );
-    process( printed, "test_src/test10.png", "processed/test10.jpg" );
-    process( printed, "test_src/test11.png", "processed/test11.jpg" );
-    process( printed, "test_src/test12.png", "processed/test12.jpg" );
-    process( printed, "test_src/test13.png", "processed/test13.jpg" );
-    process( printed, "test_src/test14.png", "processed/test14.jpg" );
-    process( printed, "test_src/test15.png", "processed/test15.jpg" );
+    process( printed, "test_src/test1.png", "processed/test1.png" );
+    process( printed, "test_src/test2.png", "processed/test2.png" );
+    process( printed, "test_src/test3.png", "processed/test3.png" );
+    process( printed, "test_src/test4.png", "processed/test4.png" );
+    process( printed, "test_src/test5.png", "processed/test5.png" );
+    process( printed, "test_src/test6.png", "processed/test6.png" );
+    process( printed, "test_src/test7.png", "processed/test7.png" );
+    process( printed, "test_src/test8.png", "processed/test8.png" );
+    process( printed, "test_src/test9.png", "processed/test9.png" );
+    process( printed, "test_src/test10.png", "processed/test10.png" );
+    process( printed, "test_src/test11.png", "processed/test11.png" );
+    process( printed, "test_src/test12.png", "processed/test12.png" );
+    process( printed, "test_src/test13.png", "processed/test13.png" );
+    process( printed, "test_src/test14.png", "processed/test14.png" );
+    process( printed, "test_src/test15.png", "processed/test15.png" );
+    process( printed, "test_src/test16.png", "processed/test16.png" );
     printed_destroy( printed );
     return EXIT_SUCCESS; 
 } 
