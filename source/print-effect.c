@@ -11,7 +11,7 @@
 #include "libs/dir.h"
 
 #include "printed.h"
-
+/*
 void combine_k_lut( void ) {
     float* klut = (float*)malloc( 4096ull * 4096ull * sizeof( float ) );
     memset( klut, 0, 4096ull * 4096ull * sizeof( float ) );
@@ -302,9 +302,9 @@ void rgb_to_cmy_halftone_dings( char const* in, char const* out ) {
             //if( cc < 26 ) cc = 255; else if( cc < 90 ) cc = c020[ xp + yp * w ]; else if( cc < 153 ) cc = c050[ xp + yp * w ]; else if( cc < 216 ) cc = c070[ xp + yp * w ]; else cc = 0;
             //if( cm < 26 ) cm = 255; else if( cm < 90 ) cm = m020[ xp + yp * w ]; else if( cm < 153 ) cm = m050[ xp + yp * w ]; else if( cm < 216 ) cm = m070[ xp + yp * w ]; else cm = 0;
             //if( cy < 26 ) cy = 255; else if( cy < 90 ) cy = y020[ xp + yp * w ]; else if( cy < 153 ) cy = y050[ xp + yp * w ]; else if( cy < 216 ) cy = y070[ xp + yp * w ]; else cy = 0;
-            if( cc < /*40*/ 45 ) cc = 255; else if( cc < /*90*/ 100 ) cc = c020[ xp + yp * mw ]; else if( cc < /*153*/ 170 ) cc = c050[ xp + yp * mw ]; /*else if( cc < 216 ) cc = c070[ xp + yp * mw ]; */ else cc = 0;
-            if( cm < /*40*/ 35 ) cm = 255; else if( cm < /*90*/ 85 ) cm = m020[ xp + yp * mw ]; else if( cm < /*153*/ 170 ) cm = m050[ xp + yp * mw ]; /*else if( cm < 216 ) cm = m070[ xp + yp * mw ]; */ else cm = 0;
-            if( cy < /*40*/ 30 ) cy = 255; else if( cy < /*90*/ 80 ) cy = y020[ xp + yp * mw ]; else if( cy < /*153*/ 170 ) cy = y050[ xp + yp * mw ]; /*else if( cy < 216 ) cy = y070[ xp + yp * mw ]; */ else cy = 0;
+            if( cc < 45 ) cc = 255; else if( cc < 100 ) cc = c020[ xp + yp * mw ]; else if( cc < 170 ) cc = c050[ xp + yp * mw ]; else cc = 0;
+            if( cm < 35 ) cm = 255; else if( cm < 85 ) cm = m020[ xp + yp * mw ]; else if( cm < 170 ) cm = m050[ xp + yp * mw ]; else cm = 0;
+            if( cy < 30 ) cy = 255; else if( cy < 80 ) cy = y020[ xp + yp * mw ]; else if( cy < 170 ) cy = y050[ xp + yp * mw ]; else cy = 0;
             cc = lerp( clut[ i ], cc, imgk[ x + y * w ] );
             cm = lerp( mlut[ i ], cm, imgk[ x + y * w ] );
             cy = lerp( ylut[ i ], cy, imgk[ x + y * w ] );
@@ -634,7 +634,7 @@ int oldmain( int argc, char** argv ) {
     overlay( "out5.png", "overlay5.png" );
     return EXIT_SUCCESS; 
 } 
-
+*/
 void process( printed_t* printed, char const* in, char const* out ) {
     int width, height;
     uint32_t* output = printed_process( printed, in, &width, &height );
