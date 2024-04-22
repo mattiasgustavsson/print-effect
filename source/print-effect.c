@@ -6,7 +6,7 @@
 #include <sys/stat.h> 
 
 #include "libs/stb_image.h"
-#include "libs/stb_image_resize.h"
+#include "libs/stb_image_resize2.h"
 #include "libs/stb_image_write.h"
 #include "libs/dir.h"
 
@@ -753,8 +753,8 @@ int xmain( int argc, char** argv ) {
 #undef STB_IMAGE_IMPLEMENTATION
 #pragma warning( pop )
 
-#define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include "libs/stb_image_resize.h"
+#define STB_IMAGE_RESIZE2_IMPLEMENTATION
+#include "libs/stb_image_resize2.h"
 
 #pragma warning( push )
 #pragma warning( disable: 4204 )

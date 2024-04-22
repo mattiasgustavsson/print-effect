@@ -306,12 +306,21 @@ uint32_t* internal_printed_rgb_to_cmy_halftone_dings( printed_t* printed, uint32
             uint32_t cy = 255 - printed->ylut[ i_shift ];
             int xp = x;
             int yp = y;
-            if( cc < 25 ) cc = 255; else if( cc < 100 ) cc = printed->c020[ xp + yp * printed->refwidth * 2 ]; else if( cc < 160 ) cc = printed->c050[ xp + yp * printed->refwidth * 2 ]; else cc = printed->c100[ xp + yp * printed->refwidth * 2 ];
-            if( cm < 35 ) cm = 255; else if( cm <  85 ) cm = printed->m020[ xp + yp * printed->refwidth * 2 ]; else if( cm < 170 ) cm = printed->m050[ xp + yp * printed->refwidth * 2 ]; else cm = printed->m100[ xp + yp * printed->refwidth * 2 ];
-            if( cy < 25 ) cy = 255; else if( cy <  80 ) cy = printed->y020[ xp + yp * printed->refwidth * 2 ]; else if( cy < 170 ) cy = printed->y050[ xp + yp * printed->refwidth * 2 ]; else cy = printed->y100[ xp + yp * printed->refwidth * 2 ];
+<<<<<<< HEAD
+            if( cc < 25 ) cc = 255; else if( cc < 100 ) cc = printed->c020[ xp + yp * printed->refwidth * 2 ]; else if( cc < 160 ) cc = printed->c050[ xp + yp * printed->refwidth * 2 ]; else cc = 0;
+            if( cm < 35 ) cm = 255; else if( cm <  85 ) cm = printed->m020[ xp + yp * printed->refwidth * 2 ]; else if( cm < 170 ) cm = printed->m050[ xp + yp * printed->refwidth * 2 ]; else cm = 0;
+            if( cy < 25 ) cy = 255; else if( cy <  80 ) cy = printed->y020[ xp + yp * printed->refwidth * 2 ]; else if( cy < 170 ) cy = printed->y050[ xp + yp * printed->refwidth * 2 ]; else cy = 0;
             cc = internal_printed_lerp( printed->clut[ i /*ic*/ ], cc, kmask[ x + y * w ] );
             cm = internal_printed_lerp( printed->mlut[ i /*im*/ ], cm, kmask[ x + y * w ] );
             cy = internal_printed_lerp( printed->ylut[ i ], cy, kmask[ x + y * w ] );
+=======
+            if( cc < 25 ) cc = 255; else if( cc < 100 ) cc = printed->c020[ xp + yp * printed->refwidth * 2 ]; else if( cc < 160 ) cc = printed->c050[ xp + yp * printed->refwidth * 2 ]; else cc = printed->c100[ xp + yp * printed->refwidth * 2 ];
+            if( cm < 35 ) cm = 255; else if( cm <  85 ) cm = printed->m020[ xp + yp * printed->refwidth * 2 ]; else if( cm < 170 ) cm = printed->m050[ xp + yp * printed->refwidth * 2 ]; else cm = printed->m100[ xp + yp * printed->refwidth * 2 ];
+            if( cy < 25 ) cy = 255; else if( cy <  80 ) cy = printed->y020[ xp + yp * printed->refwidth * 2 ]; else if( cy < 170 ) cy = printed->y050[ xp + yp * printed->refwidth * 2 ]; else cy = printed->y100[ xp + yp * printed->refwidth * 2 ];
+            cc = lerp( printed->clut[ i /*ic*/ ], cc, kmask[ x + y * w ] );
+            cm = lerp( printed->mlut[ i /*im*/ ], cm, kmask[ x + y * w ] );
+            cy = lerp( printed->ylut[ i ], cy, kmask[ x + y * w ] );
+>>>>>>> aa01d87 (Improved dings)
             uint32_t cmy = ( cc << 16 ) | ( cm << 8 ) | cy;
             output[ x + y * w ] = 0xff000000 | ( cmy & 0xffffff );
         }
@@ -359,7 +368,11 @@ uint8_t* internal_printed_noise_k( printed_t* printed, uint8_t* in_k, int width,
             uint32_t v = output[ x + y * w ];
             v = internal_printed_lerp( v, internal_printed_lerp( v, 255, n ), 105 );
             
-            output[ x + y * w ] = internal_printed_lerp( v < k ? v : k, 255, internal_printed_subclamp( 40, printed->dings[ x + y * printed->refwidth * 2 ] / 8 ) );
+<<<<<<< HEAD
+            output[ x + y * w ] = internal_printed_lerp( v < k ? v : k, 255, internal_printed_subclamp( 40, printed->dingsk[ x + y * printed->refwidth * 2 ] / 8 ) );
+=======
+            output[ x + y * w ] = lerp( v < k ? v : k, 255, subclamp( 40, ( printed->dings[ x + y * printed->refwidth * 2 ] ) / 8 ) );
+>>>>>>> aa01d87 (Improved dings)
         }
     }
     
