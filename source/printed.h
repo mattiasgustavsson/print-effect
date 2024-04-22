@@ -4,10 +4,19 @@ typedef struct printed_t {
     int refwidth;
     int refheight;
     
+    uint32_t hash;
+
     uint8_t* klut;
     uint8_t* clut;
     uint8_t* mlut;
     uint8_t* ylut;
+
+    uint8_t* c020src;
+    uint8_t* m020src;
+    uint8_t* y020src;
+    uint8_t* c050src;
+    uint8_t* m050src;
+    uint8_t* y050src;
 
     uint8_t* c020;
     uint8_t* m020;
@@ -15,11 +24,16 @@ typedef struct printed_t {
     uint8_t* c050;
     uint8_t* m050;
     uint8_t* y050;
+    uint8_t* c100;
+    uint8_t* m100;
+    uint8_t* y100;
 
-    uint8_t* dingsc;
-    uint8_t* dingsm;
-    uint8_t* dingsy;
-    uint8_t* dingsk;
+    uint8_t* dingssrc;
+    int dingssrc_width;
+    int dingssrc_height;
+
+    uint8_t* dingsmask;
+    uint8_t* dings;
 
     uint8_t* noise;
     uint8_t* unfiltered_noise;
@@ -66,46 +80,44 @@ printed_t* printed_create( void ) {
     printed->ylut = (uint8_t*) stbi_load( "data/y.png", &w, &h, &t, 1 );
     if( !printed->ylut ) goto error;
 
-    printed->c020 = (uint8_t*) stbi_load( "data/c020.png", &w, &h, &t, 1 );
-    if( !printed->c020 || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
-    printed->m020 = (uint8_t*) stbi_load( "data/m020.png", &w, &h, &t, 1 );
-    if( !printed->m020 || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
-    printed->y020 = (uint8_t*) stbi_load( "data/y020.png", &w, &h, &t, 1 );
-    if( !printed->y020 || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
-    printed->c050 = (uint8_t*) stbi_load( "data/c050.png", &w, &h, &t, 1 );
-    if( !printed->c050 || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
-    printed->m050 = (uint8_t*) stbi_load( "data/m050.png", &w, &h, &t, 1 );
-    if( !printed->m050 || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
-    printed->y050 = (uint8_t*) stbi_load( "data/y050.png", &w, &h, &t, 1 );
-    if( !printed->y050 || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
-
-    printed->dingsc = (uint8_t*) stbi_load( "data/dingsc.png", &w, &h, &t, 1 );
-    if( !printed->dingsc || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
-    printed->dingsm = (uint8_t*) stbi_load( "data/dingsm.png", &w, &h, &t, 1 );
-    if( !printed->dingsm || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
-    printed->dingsy = (uint8_t*) stbi_load( "data/dingsy.png", &w, &h, &t, 1 );
-    if( !printed->dingsy || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
-    printed->dingsk = (uint8_t*) stbi_load( "data/dingsk.png", &w, &h, &t, 1 );
-    if( !printed->dingsk || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
+    printed->c020src = (uint8_t*) stbi_load( "data/c020.png", &w, &h, &t, 1 );
+    if( !printed->c020src || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
+    printed->m020src = (uint8_t*) stbi_load( "data/m020.png", &w, &h, &t, 1 );
+    if( !printed->m020src || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
+    printed->y020src = (uint8_t*) stbi_load( "data/y020.png", &w, &h, &t, 1 );
+    if( !printed->y020src || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
+    printed->c050src = (uint8_t*) stbi_load( "data/c050.png", &w, &h, &t, 1 );
+    if( !printed->c050src || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
+    printed->m050src = (uint8_t*) stbi_load( "data/m050.png", &w, &h, &t, 1 );
+    if( !printed->m050src || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
+    printed->y050src = (uint8_t*) stbi_load( "data/y050.png", &w, &h, &t, 1 );
+    if( !printed->y050src || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
 
     printed->noise = (uint8_t*) stbi_load( "data/cloud_noise.png", &w, &h, &t, 1 );
     if( !printed->noise || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
     printed->unfiltered_noise = (uint8_t*) stbi_load( "data/unfiltered_noise.png", &w, &h, &t, 1 );
     if( !printed->unfiltered_noise || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
 
-    printed->tex = (uint32_t*) stbi_load( "data/paper_desat.png", &w, &h, &t, 4 );
+    printed->tex = (uint32_t*) stbi_load( "data/paper2.png", &w, &h, &t, 4 );
     if( !printed->tex || w != printed->refwidth * 2 || h != printed->refheight ) goto error;
 
-    for( int y = 0; y < printed->refheight; ++y ) {
-        for( int x = 0; x < printed->refwidth * 2; ++x ) {
-            printed->c020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->c020[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsc[ x + y * printed->refwidth * 2 ], 0, 232 ) );
-            printed->c050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->c050[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsc[ x + y * printed->refwidth * 2 ], 0, 232 ) );
-            printed->m020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->m020[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsm[ x + y * printed->refwidth * 2 ], 0, 240 ) );
-            printed->m050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->m050[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsm[ x + y * printed->refwidth * 2 ], 0, 240 ) );
-            printed->y020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->y020[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsy[ x + y * printed->refwidth * 2 ], 0, 232 ) );
-            printed->y050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->y050[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dingsy[ x + y * printed->refwidth * 2 ], 0, 232 ) );
-        }
-    }
+    printed->dingssrc = (uint8_t*) stbi_load( "data/dings.png", &printed->dingssrc_width, &printed->dingssrc_height, &t, 1 );
+    if( !printed->dingssrc ) goto error;
+    printed->dingsmask = (uint8_t*) stbi_load( "data/dingsmask.png", &w, &h, &t, 1 );
+    if( !printed->dingsmask || w != printed->refwidth * 4 || h != printed->refheight * 2 ) goto error;
+
+    printed->dings = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+
+    printed->c020 = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+    printed->m020 = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+    printed->y020 = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+    printed->c050 = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+    printed->m050 = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+    printed->y050 = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+    printed->c100 = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+    printed->m100 = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+    printed->y100 = (uint8_t*) malloc( printed->refwidth * printed->refheight * 2 * sizeof( uint8_t ) );
+
 
     return printed;
 error:
@@ -125,10 +137,15 @@ void printed_destroy( printed_t* printed ) {
     if( printed->c050 ) free( printed->c050 );
     if( printed->m050 ) free( printed->m050 );
     if( printed->y050 ) free( printed->y050 );
-    if( printed->dingsc ) free( printed->dingsc );
-    if( printed->dingsm ) free( printed->dingsm );
-    if( printed->dingsy ) free( printed->dingsy );
-    if( printed->dingsk ) free( printed->dingsk );
+    if( printed->c100 ) free( printed->c100 );
+    if( printed->m100 ) free( printed->m100 );
+    if( printed->y100 ) free( printed->y100 );
+    if( printed->c020src ) free( printed->c020src );
+    if( printed->m020src ) free( printed->m020src );
+    if( printed->y020src ) free( printed->y020src );
+    if( printed->c050src ) free( printed->c050src );
+    if( printed->m050src ) free( printed->m050src );
+    if( printed->y050src ) free( printed->y050src );
     if( printed->noise ) free( printed->noise );
     if( printed->unfiltered_noise ) free( printed->unfiltered_noise );
     if( printed->tex ) free( printed->tex );
@@ -173,7 +190,80 @@ uint32_t internal_printed_hueshift( uint32_t in ) {
 }
 
 
+void internal_printed_make_dings( printed_t* printed ) {
+    int mask_ofs_x = rand() % ( printed->refwidth * 2 );
+    int mask_ofs_y = rand() % printed->refheight;
+    int dings_ofs_x = rand() % ( printed->dingssrc_width - printed->refwidth * 2 );
+    int dings_ofs_y = rand() % ( printed->dingssrc_height - printed->refheight );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->dings[ x + y * printed->refwidth * 2 ] = ( printed->dingssrc[ dings_ofs_x + x + ( dings_ofs_y + y ) * printed->dingssrc_width ] * ( 255 - printed->dingsmask [ mask_ofs_x + x + ( mask_ofs_y + y ) * printed->refwidth * 4 ] ) ) / 255;
+        }
+    }
+}
+
 uint32_t* internal_printed_rgb_to_cmy_halftone_dings( printed_t* printed, uint32_t* source, int width, int height ) {    
+    int valy = 200;
+    int valc = valy + 9;
+    int valm = valy + 18;
+    //val = 0;
+    internal_printed_make_dings( printed );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->c020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->c020src[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dings[ x + y * printed->refwidth * 2 ], 0, valc ) );
+        }
+    }
+    internal_printed_make_dings( printed );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->c050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->c050src[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dings[ x + y * printed->refwidth * 2 ], 0, valc ) );
+        }
+    }
+    internal_printed_make_dings( printed );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->c100[ x + y * printed->refwidth * 2 ] = internal_printed_subclamp( 0, internal_printed_lerp( printed->dings[ x + y * printed->refwidth * 2 ], 0, valc / 2) );
+        }
+    }
+
+    internal_printed_make_dings( printed );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->m020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->m020src[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dings[ x + y * printed->refwidth * 2 ], 0, valm ) );
+        }
+    }
+    internal_printed_make_dings( printed );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->m050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->m050src[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dings[ x + y * printed->refwidth * 2 ], 0, valm ) );
+        }
+    }
+    internal_printed_make_dings( printed );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->m100[ x + y * printed->refwidth * 2 ] = internal_printed_subclamp( 0, internal_printed_lerp( printed->dings[ x + y * printed->refwidth * 2 ], 0, valm / 2) );
+        }
+    }
+
+    internal_printed_make_dings( printed );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->y020[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->y020src[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dings[ x + y * printed->refwidth * 2 ], 0, valy ) );
+        }
+    }
+    internal_printed_make_dings( printed );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->y050[ x + y * printed->refwidth * 2 ] = internal_printed_addclamp( printed->y050src[ x + y * printed->refwidth * 2 ], internal_printed_lerp( printed->dings[ x + y * printed->refwidth * 2 ], 0, valy ) );
+        }
+    }
+    internal_printed_make_dings( printed );
+    for( int y = 0; y < printed->refheight; ++y ) {
+        for( int x = 0; x < printed->refwidth * 2; ++x ) {
+            printed->y100[ x + y * printed->refwidth * 2 ] = internal_printed_subclamp( 0, internal_printed_lerp( printed->dings[ x + y * printed->refwidth * 2 ], 0, valy / 2 ) );
+        }
+    }
+
     int w = width;
     int h = height;
     uint8_t* kmask = (uint8_t*)malloc( w * h );
@@ -194,6 +284,7 @@ uint32_t* internal_printed_rgb_to_cmy_halftone_dings( printed_t* printed, uint32
             }
         }
     }
+
     uint32_t* output = (uint32_t*) malloc( width * height * sizeof( uint32_t ) );
     for( int y = 0; y < h; ++y ) {
         for( int x = 0; x < w; ++x ) {
@@ -215,12 +306,12 @@ uint32_t* internal_printed_rgb_to_cmy_halftone_dings( printed_t* printed, uint32
             uint32_t cy = 255 - printed->ylut[ i_shift ];
             int xp = x;
             int yp = y;
-            if( cc < 25 ) cc = 255; else if( cc < 100 ) cc = printed->c020[ xp + yp * printed->refwidth * 2 ]; else if( cc < 160 ) cc = printed->c050[ xp + yp * printed->refwidth * 2 ]; else cc = 0;
-            if( cm < 35 ) cm = 255; else if( cm <  85 ) cm = printed->m020[ xp + yp * printed->refwidth * 2 ]; else if( cm < 170 ) cm = printed->m050[ xp + yp * printed->refwidth * 2 ]; else cm = 0;
-            if( cy < 25 ) cy = 255; else if( cy <  80 ) cy = printed->y020[ xp + yp * printed->refwidth * 2 ]; else if( cy < 170 ) cy = printed->y050[ xp + yp * printed->refwidth * 2 ]; else cy = 0;
-            cc = internal_printed_lerp( printed->clut[ i /*ic*/ ], cc, kmask[ x + y * w ] );
-            cm = internal_printed_lerp( printed->mlut[ i /*im*/ ], cm, kmask[ x + y * w ] );
-            cy = internal_printed_lerp( printed->ylut[ i ], cy, kmask[ x + y * w ] );
+            if( cc < 25 ) cc = 255; else if( cc < 100 ) cc = printed->c020[ xp + yp * printed->refwidth * 2 ]; else if( cc < 160 ) cc = printed->c050[ xp + yp * printed->refwidth * 2 ]; else cc = printed->c100[ xp + yp * printed->refwidth * 2 ];
+            if( cm < 35 ) cm = 255; else if( cm <  85 ) cm = printed->m020[ xp + yp * printed->refwidth * 2 ]; else if( cm < 170 ) cm = printed->m050[ xp + yp * printed->refwidth * 2 ]; else cm = printed->m100[ xp + yp * printed->refwidth * 2 ];
+            if( cy < 25 ) cy = 255; else if( cy <  80 ) cy = printed->y020[ xp + yp * printed->refwidth * 2 ]; else if( cy < 170 ) cy = printed->y050[ xp + yp * printed->refwidth * 2 ]; else cy = printed->y100[ xp + yp * printed->refwidth * 2 ];
+            cc = lerp( printed->clut[ i /*ic*/ ], cc, kmask[ x + y * w ] );
+            cm = lerp( printed->mlut[ i /*im*/ ], cm, kmask[ x + y * w ] );
+            cy = lerp( printed->ylut[ i ], cy, kmask[ x + y * w ] );
             uint32_t cmy = ( cc << 16 ) | ( cm << 8 ) | cy;
             output[ x + y * w ] = 0xff000000 | ( cmy & 0xffffff );
         }
@@ -257,6 +348,7 @@ uint8_t* internal_printed_noise_k( printed_t* printed, uint8_t* in_k, int width,
         }
     }
     
+    internal_printed_make_dings( printed );
     for( int y = 0; y < h; ++y ) {
         for( int x = 0; x < w; ++x ) {
             uint32_t n = printed->noise[ ( x % ( printed->refwidth * 2 ) ) + ( y % printed->refheight ) * ( printed->refwidth * 2 ) ];
@@ -394,6 +486,13 @@ uint32_t* printed_process( printed_t* printed, char const* filename, int* out_wi
     int w, h, t;
     uint32_t* source = (uint32_t*) stbi_load( filename, &w, &h, &t, 4 );
     if( !source ) return NULL;
+
+    uint32_t hash = 5381u; 
+    for( char const* s = filename; *s != '\0'; ++s ) {
+        hash = ( ( hash << 5u ) + hash ) ^ (*s);
+    }
+    printed->hash = hash;
+    srand( hash );
     
     // TODO: rescale
     int width = w;
