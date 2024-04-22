@@ -494,9 +494,27 @@ uint32_t* printed_process( printed_t* printed, char const* filename, int* out_wi
     printed->hash = hash;
     srand( hash );
     
-    // TODO: rescale
-    int width = w;
-    int height = h;
+    
+    float ar = (float)w / (float)h;
+    int scaledw = w;
+    int scaledh = h;
+    if( 3056 * ar > 3976 ) {
+        scaledw = 3976;
+        scaledh = 3976 / ar;
+    } else {
+        scaledw = 3056 * ar;
+        scaledh = 3056;
+    }
+
+    uint32_t* scaled = (uint32_t*) malloc( scaledw * scaledh * sizeof( uint32_t ) );    
+    stbir_resize_uint8_linear( source, w, h, w * 4, scaled, scaledw, scaledh, scaledw * 4, STBIR_BGRA );
+
+    free( source );
+    source = scaled;
+
+
+    int width = scaledw;
+    int height = scaledh;
 
     uint8_t* k = internal_printed_rgb_to_k( printed, source, width, height );
     uint8_t* noise_k = internal_printed_noise_k( printed, k, width, height );
