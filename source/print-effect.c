@@ -134,7 +134,7 @@ int main( int argc, char** argv ) {
 #include "libs/dir.h"
 
 
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __TINYC__ )
 
     #include <windows.h>
 
