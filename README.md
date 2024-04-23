@@ -7,8 +7,4 @@ Code is public domain, use for whatever, at your own risk etc.
 
 ## Examples
 
-![print-effect](https://mattiasgustavsson.com/img/print/kraven.png)
-
-![print-effect](https://mattiasgustavsson.com/img/print/xmen.png)
-
-(more examples can be found here: https://mattiasgustavsson.com/img/print/)
+Examples can be found here: https://mattiasgustavsson.com/img/print/
