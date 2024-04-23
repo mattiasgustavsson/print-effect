@@ -506,11 +506,13 @@ uint32_t* printed_process( printed_t* printed, char const* filename, int* out_wi
         scaledh = 3056;
     }
 
-    uint32_t* scaled = (uint32_t*) malloc( scaledw * scaledh * sizeof( uint32_t ) );    
-    stbir_resize_uint8_linear( (unsigned char*)source, w, h, w * 4, (unsigned char*)scaled, scaledw, scaledh, scaledw * 4, STBIR_BGRA );
+    if( scaledw != w && scaledh != h ) {
+        uint32_t* scaled = (uint32_t*) malloc( scaledw * scaledh * sizeof( uint32_t ) );    
+        stbir_resize_uint8_linear( (unsigned char*)source, w, h, w * 4, (unsigned char*)scaled, scaledw, scaledh, scaledw * 4, STBIR_BGRA );
 
-    free( source );
-    source = scaled;
+        free( source );
+        source = scaled;
+    }
 
 
     int width = scaledw;
