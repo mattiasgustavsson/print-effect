@@ -507,7 +507,7 @@ uint32_t* printed_process( printed_t* printed, char const* filename, int* out_wi
     }
 
     uint32_t* scaled = (uint32_t*) malloc( scaledw * scaledh * sizeof( uint32_t ) );    
-    stbir_resize_uint8_linear( source, w, h, w * 4, scaled, scaledw, scaledh, scaledw * 4, STBIR_BGRA );
+    stbir_resize_uint8_linear( (unsigned char*)source, w, h, w * 4, (unsigned char*)scaled, scaledw, scaledh, scaledw * 4, STBIR_BGRA );
 
     free( source );
     source = scaled;
